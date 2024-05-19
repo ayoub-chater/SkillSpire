@@ -16,8 +16,8 @@ class Formation extends Model
         'start_date',
         'end_date',
         'image_path',
-        'professeur_id',
-        'center_id',
+        'professor_id',
+        'centre_id',
         'salle_id',
     ];
 
