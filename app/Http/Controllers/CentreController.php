@@ -14,6 +14,18 @@ class CentreController extends Controller
         return response()->json($centres);
     }
 
+    
+    public function fetchFormationsByCentre($centreId)
+    {
+        $centre = Centre::findOrFail($centreId);
+
+        $formations = $centre->formations()->get();
+
+        return response()->json($formations);
+    }
+
+
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -31,6 +43,7 @@ class CentreController extends Controller
 
         return response()->json(['message' => 'Centre created successfully']);
     }
+
 
 
     public function update(Request $request, $id)
@@ -52,6 +65,7 @@ class CentreController extends Controller
 
         return response()->json(['message' => 'Centre updated successfully']);
     }
+
 
 
     public function destroy($id)

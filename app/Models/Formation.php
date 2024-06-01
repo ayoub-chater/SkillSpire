@@ -26,9 +26,9 @@ class Formation extends Model
         return $this->belongsTo(Professor::class);
     }
 
-    public function center()
+    public function centre()
     {
-        return $this->belongsTo(Center::class);
+        return $this->belongsTo(Centre::class);
     }
 
     public function salle()

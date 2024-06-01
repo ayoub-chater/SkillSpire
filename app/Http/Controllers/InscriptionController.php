@@ -14,6 +14,7 @@ class InscriptionController extends Controller
         return response()->json($formations);
     }
 
+    
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -32,5 +33,5 @@ class InscriptionController extends Controller
 
         return response()->json(['message' => 'Inscription created successfully']);
     }
-    
+
 }

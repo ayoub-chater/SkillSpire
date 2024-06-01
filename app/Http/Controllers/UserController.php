@@ -18,7 +18,13 @@ class UserController extends Controller
         if (!in_array($role, $validRoles)) {
             return response()->json(['error' => 'Invalid role'], 400);
         }
+
         $users = User::whereHas($role)->get();
+
+        if ($role === 'professors') {
+            $users->load('professors');
+        }
+
         return response()->json($users);
     }
 
@@ -29,8 +35,27 @@ class UserController extends Controller
         if (!in_array($role, $validRoles)) {
             return response()->json(['error' => 'Invalid role'], 400);
         }
-        $user = User::whereHas($role)->findOrFail($id);
-        return response()->json($user);
+
+        $user = User::whereHas($role)->with($role)->findOrFail($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $userRoleInfo = $user->only(['id', 'name', 'email', 'created_at', 'updated_at']);
+
+        if ($role === 'participants') {
+            $userRoleInfo['role'] = 'participants';
+            $userRoleInfo['participant_info'] = $user->participants;
+        } elseif ($role === 'admin') {
+            $userRoleInfo['role'] = 'admin';
+            $userRoleInfo['admin_info'] = $user->admin;
+        } elseif ($role === 'professor') {
+            $userRoleInfo['role'] = 'professor';
+            $userRoleInfo['professor_info'] = $user->professor;
+        }
+
+        return response()->json($userRoleInfo);
     }
 
 
@@ -49,14 +74,12 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // Create a new user in the User table
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        // Create corresponding entries in the appropriate role tables
         switch ($role) {
             case 'admins':
                 Admin::create(['user_id' => $user->id]);
@@ -64,6 +87,7 @@ class UserController extends Controller
             case 'professors':
                 Professor::create([
                     'user_id' => $user->id,
+                    'image_path' => $request->image_path,
                     'expertise' => $request->expertise,
                     'qualification' => $request->qualification,
                 ]);
@@ -75,7 +99,6 @@ class UserController extends Controller
 
         return response()->json($user, 201);
     }
-
 
 
     private function getValidationRulesForRole($role)

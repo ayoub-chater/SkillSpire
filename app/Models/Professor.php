@@ -11,6 +11,7 @@ class Professor extends Model
 
     protected $fillable = [
         'user_id',
+        'image_path',
         'expertise',
         'qualification'
     ];

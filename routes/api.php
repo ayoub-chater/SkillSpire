@@ -30,6 +30,9 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::get('/formations', [FormationController::class, 'index']);
 Route::get('/formations/{id}', [FormationController::class, 'show']);
 Route::post('/formations', [FormationController::class, 'store']);
+Route::get('/participants/{participant}', [FormationController::class, 'getFormationsByParticipant']);
+Route::get('/centres/{centreId}/formations', [CentreController::class, 'fetchFormationsByCentre']);
+
 
 
 

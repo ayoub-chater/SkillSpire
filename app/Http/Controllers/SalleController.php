@@ -15,6 +15,7 @@ class SalleController extends Controller
         return response()->json($salles);
     }
 
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -33,6 +34,7 @@ class SalleController extends Controller
 
         return response()->json(['message' => 'Salle created successfully']);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -53,6 +55,7 @@ class SalleController extends Controller
 
         return response()->json(['message' => 'Salle updated successfully']);
     }
+    
 
     public function destroy($id)
     {

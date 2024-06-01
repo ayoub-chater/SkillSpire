@@ -4,15 +4,64 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Formation;
+use App\Models\Participant;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+
 
 class FormationController extends Controller
 {
     public function index()
     {
-        $formations = Formation::all();
+        $formations = Formation::with('salle', 'professor.user', 'centre')->get();
+
+        $formations = $this->getFormationsWithProfessorName($formations);
+
         return response()->json($formations);
     }
+
+
+    public function getFormationsWithProfessorName($formations)
+    {
+        $transformedFormations = $formations->map(function ($formation) {
+            $professorName = $formation->professor->user->name;
+
+            $formation['professor_name'] = $professorName;
+            return $formation;
+        });
+
+        return $transformedFormations;
+    }
+
+
+
+    public function getFormationsByParticipant($participantId)
+    {
+        $formations = DB::table('inscriptions')
+                        ->where('participant_id', $participantId)
+                        ->join('formations', 'inscriptions.formation_id', '=', 'formations.id')
+                        ->select('formations.*')
+                        ->get();
+
+        return $formations;
+    }
+
+
+
+    public function show($id)
+    {
+        $formation = Formation::with('salle', 'professor.user', 'centre')->find($id);
+
+        if (!$formation) {
+            return response()->json(['error' => 'Formation not found'], 404);
+        }
+
+        $formation['professor_name'] = $formation->professor->user->name;
+
+        return response()->json($formation);
+    }
+
+
 
     public function store(Request $request)
     {
@@ -37,6 +86,8 @@ class FormationController extends Controller
 
         return response()->json(['message' => 'Formation created successfully']);
     }
+
+
 
     public function update(Request $request, $id)
     {
@@ -63,6 +114,8 @@ class FormationController extends Controller
         return response()->json(['message' => 'Formation updated successfully']);
     }
 
+
+    
     public function destroy($id)
     {
         $formation = Formation::findOrFail($id);

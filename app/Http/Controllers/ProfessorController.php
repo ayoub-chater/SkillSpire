@@ -14,4 +14,5 @@ class ProfessorController extends Controller
         $formations = $Professor->formations;
         return response()->json($formations);
     }
+
 }

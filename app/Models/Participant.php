@@ -28,6 +28,11 @@ class Participant extends Model
         return $this->hasMany(Inscription::class);
     }
 
+    public function formations()
+    {
+        return $this->hasManyThrough(Formation::class, Inscription::class);
+    }
+
     public function avis()
     {
         return $this->hasMany(Avis::class);
