@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FormationController;
 use App\Http\Controllers\SalleController;
 use App\Http\Controllers\CentreController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\InscriptionController;
@@ -76,3 +77,6 @@ Route::get('/historiques/{id}', [ParticipantController::class, 'historiques']);
 Route::get('/formationsProf/{id}', [ProfessorController::class, 'formationsForProfessors']);
 
 
+// Contact
+
+Route::post('/contact',[ContactController::class, 'sendMail']);

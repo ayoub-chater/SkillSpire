@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\Participant;
+use App\Models\Professor;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -30,7 +33,12 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'participants'
         ]);
+
+        $participant = Participant::create(['user_id' => $user->id]);
+
+        
 
         event(new Registered($user));
 
@@ -38,4 +46,6 @@ class RegisteredUserController extends Controller
 
         return response()->noContent();
     }
+
+    
 }

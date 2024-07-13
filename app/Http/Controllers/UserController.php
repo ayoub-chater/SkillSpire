@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Admin;
 use App\Models\User;
 use App\Models\Professor;
 use App\Models\Participant;
@@ -8,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -80,6 +83,7 @@ class UserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+
         switch ($role) {
             case 'admins':
                 Admin::create(['user_id' => $user->id]);
@@ -93,11 +97,11 @@ class UserController extends Controller
                 ]);
                 break;
             case 'participants':
-                Participant::create(['user_id' => $user->id]);
+                $part = Participant::create(['user_id' => $user->id]);
                 break;
         }
 
-        return response()->json($user, 201);
+        return response()->json(['user' =>$user , 'participant' => $part], 200);
     }
 
 

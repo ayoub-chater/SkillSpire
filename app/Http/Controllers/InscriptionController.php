@@ -31,7 +31,7 @@ class InscriptionController extends Controller
 
         $centre = Inscription::create($validator->validated());
 
-        return response()->json(['message' => 'Inscription created successfully']);
+        return response()->json(['message' => 'Inscription created successfully' , 'inscription' => $centre]);
     }
 
 }
