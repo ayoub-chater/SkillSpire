@@ -10,6 +10,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\ProfessorController;
 use App\Http\Controllers\InscriptionController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 
 // Formations
-Route::get('/formations', [FormationController::class, 'index']);
+Route::get('/formations', [FormationController::class, 'index'])->name('courses');
 Route::get('/formations/{id}', [FormationController::class, 'show']);
 Route::post('/formations', [FormationController::class, 'store']);
 Route::get('/participants/{participant}', [FormationController::class, 'getFormationsByParticipant']);
@@ -65,6 +66,18 @@ Route::post('/users/{role}', [UserController::class, 'store']);
 // Inscription
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
+
+// Route::post('pay', [PaymentController::class, 'pay']);
+Route::middleware(['web'])->group(function () {
+    Route::post('pay', [PaymentController::class, 'pay'])->name('pay');
+});
+Route::middleware(['web'])->group(function () {
+    Route::get('/success', [PaymentController::class, 'success']);
+
+});
+Route::middleware(['web'])->group(function () {
+    Route::get('/error', [PaymentController::class, 'error']);
+});
 
 
 

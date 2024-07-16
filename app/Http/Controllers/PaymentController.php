@@ -15,6 +15,7 @@ class PaymentController extends Controller
 
     public function __construct()
     {
+
         $this->gateway = Omnipay::create('PayPal_Rest');
         $this->gateway->setClientId(env('PAYPAL_CLIENT_ID'));
         $this->gateway->setSecret(env('PAYPAL_CLIENT_SECRET'));
@@ -23,37 +24,48 @@ class PaymentController extends Controller
 
     public function pay(Request $request)
     {
-        // $request->session()->put('payment_data', $request->all());
-
         try {
             
             // $validator = Validator::make($request->all(), [
-            //     'participant_id' => 'required|exists:participants,id',
+            //     'user_id' => 'required|exists:users,id',
             //     'formation_id' => 'required|exists:formations,id',
-            //     'status' => 'required|string|max:255',
-            //     'payment_proof' => 'required|string|max:255',
-            //     'justification' => 'string|max:255',
             // ]);
     
             // if ($validator->fails()) {
             //     return response()->json($validator->errors());
             // }
     
-            // $centre = Inscription::create($validator->validated());
+            // Inscription::create($request->all());
     
             // return response()->json(['message' => 'Inscription created successfully' , 'inscription' => $centre]);
+
+            $data = $request->all();
+            $inscriptions = [];
+            foreach($data['inscriptions'] as $item){
+                
+                $inscriptions[] = [
+                    'user_id' => $item['user_id'],
+                    'formation_id' => $item['formation']['id'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                $request->session()->put('user_id',$item['user_id']);
+            }
+
+            DB::table('inscriptions')->insert($inscriptions);
 
             $response = $this->gateway
                 ->purchase([
                     'amount' => $request->amount,
                     'currency' => env('PAYPAL_CURRENCY'),
-                    'returnUrl' => url('inscriptions/success'),
-                    'cancelUrl' => url('inscriptions/error'),
+                    'returnUrl' => url('/api/success'),
+                    'cancelUrl' => url('/api/error'),
                 ])
                 ->send();
 
             if ($response->isRedirect()) {
-                $response->redirect();
+                return response()->json(['redirectUrl' => $response->getRedirectUrl() ,'data' => $request->all()]);
+
             } else {
                 return $response->getMessage();
             }
@@ -79,6 +91,7 @@ class PaymentController extends Controller
                 DB::beginTransaction();
 
                 try {
+
                     $payment = new Payment();
                     $payment->payment_id = $arr_body['id'];
                     $payment->payer_id =
@@ -88,41 +101,90 @@ class PaymentController extends Controller
                     $payment->amount =
                         $arr_body['transactions'][0]['amount']['total'];
                     $payment->currency = env('PAYPAL_CURRENCY');
-                    $payment->payment_status = $arr_body['state'];
+                    $payment->status = $arr_body['state'];
                     $payment->save();
 
+                    $user_id = $request->session()->get('user_id');
+                    
+                    $inscriptions = Inscription::where('user_id', $user_id)
+                    ->where('status', 'pending')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                    
+                    foreach($inscriptions as $inscription){
+                        $inscription->status = "paid";
+                        $inscription->save();
+
+                    }
+
 
                     
-
-
-
-                    
-
                     DB::commit();
-                    return response(['message' => 'Payment completed successfully'],200);
-                    // return view('guests.success', [
-                    //     'id' => $arr_body['id'],
-                    // ]);
+                    $success = 'Payment completed successfully.';
+                    // $id= $inscription->formation_id;
+                    return redirect()->to("http://localhost:5173/success?message=$success");
+                    // return response(['success' => 'Payment completed successfully'],200);
+
                 } catch (\Exception $e) {
                     DB::rollback();
                     throw $e;
                 }
 
-                // Clear the session
-                // $request->session()->forget('payment_data');
+
             } else {
-                return response(['message' => 'Payment failed'],400);
-                // return view('guests.error');
+                    $user_id = $request->session()->get('user_id');
+                                        
+                    $inscriptions = Inscription::where('user_id', $user_id)
+                    ->where('status', 'pending')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                    
+                    foreach($inscriptions as $inscription){
+                        $inscription->status = "canceled";
+                        $inscription->save();
+
+                    }
+
+                    $error = 'Payment Failed.';
+
+                    return redirect()->to("http://localhost:5173/cart?error=$error");
             }
         } else {
+                    $user_id = $request->session()->get('user_id');
+            
+                    $inscriptions = Inscription::where('user_id', $user_id)
+                    ->where('status', 'pending')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                    
+                    foreach($inscriptions as $inscription){
+                        $inscription->status = "canceled";
+                        $inscription->save();
 
-            return response(['message' => 'Payment failed'],400);
-            // return view('guests.error');
+                    }
+
+            $error = 'Payment Failed.';
+
+            return redirect()->to("http://localhost:5173/cart?error=$error");
         }
     }
-    public function error()
+    public function error(Request $request)
     {
-        return response(['message' => 'Payment failed'],400);
-        // return view('guests.decline');
+        $user_id = $request->session()->get('user_id');
+                    
+        $inscriptions = Inscription::where('user_id', $user_id)
+                    ->where('status', 'pending')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+                    
+                    foreach($inscriptions as $inscription){
+                        $inscription->status = "canceled";
+                        $inscription->save();
+
+                    }
+
+        $error = 'Payment Failed.';
+       
+        return redirect()->to("http://localhost:5173/cart?error=$error");
     }
 }

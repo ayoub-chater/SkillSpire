@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000', 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-70P31848T0576684K
+
+'),'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-70P31848T0576684K
+
+'],
 
     'allowed_origins_patterns' => [],
 

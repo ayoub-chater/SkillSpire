@@ -10,11 +10,9 @@ class Inscription extends Model
     use HasFactory;
 
     protected $fillable = [
-        'participant_id',
+        'user_id',
         'formation_id',
-        'payment_proof',
         'status',
-        'justification',
     ];
 
     public function participant()
