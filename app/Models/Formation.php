@@ -45,4 +45,9 @@ class Formation extends Model
     {
         return $this->hasMany(Avis::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'inscriptions', 'formation_id', 'user_id');
+    }
 }

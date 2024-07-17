@@ -38,7 +38,7 @@ class FormationController extends Controller
     public function getFormationsByParticipant($participantId)
     {
         $formations = DB::table('inscriptions')
-                        ->where('participant_id', $participantId)
+                        ->where('user_id', $participantId)
                         ->join('formations', 'inscriptions.formation_id', '=', 'formations.id')
                         ->select('formations.*')
                         ->get();
@@ -115,7 +115,7 @@ class FormationController extends Controller
     }
 
 
-    
+
     public function destroy($id)
     {
         $formation = Formation::findOrFail($id);

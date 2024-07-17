@@ -33,7 +33,7 @@ Route::get('/formations/{id}', [FormationController::class, 'show']);
 Route::post('/formations', [FormationController::class, 'store']);
 Route::get('/participants/{participant}', [FormationController::class, 'getFormationsByParticipant']);
 Route::get('/centres/{centreId}/formations', [CentreController::class, 'fetchFormationsByCentre']);
-
+Route::delete('/formations/{id}', [FormationController::class, 'destroy']);
 
 
 
@@ -59,12 +59,15 @@ Route::get('/users/{role}', [UserController::class, 'usersByRole']);
 Route::get('/users/{role}/{id}', [UserController::class, 'show']);
 Route::delete('/users/{role}/{id}', [UserController::class, 'destroy']);
 Route::post('/users/{role}', [UserController::class, 'store']);
+Route::put('/users/{id}', [UserController::class, 'update']);
 
 
 
 // Inscription
 Route::get('/inscriptions', [InscriptionController::class, 'index']);
 Route::post('/inscriptions', [InscriptionController::class, 'store']);
+Route::get('/inscriptions/users/{formationId}', [InscriptionController::class, 'getUsersByFormation']);
+
 
 
 
@@ -78,5 +81,4 @@ Route::get('/formationsProf/{id}', [ProfessorController::class, 'formationsForPr
 
 
 // Contact
-
 Route::post('/contact',[ContactController::class, 'sendMail']);

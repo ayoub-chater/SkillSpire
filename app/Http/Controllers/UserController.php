@@ -158,11 +158,11 @@ class UserController extends Controller
 
     public function destroy($role, $id)
     {
-        $validRoles = ['admins', 'participants', 'professors'];
+        $validRoles = ['admin', 'participant', 'professor'];
         if (!in_array($role, $validRoles)) {
             return response()->json(['error' => 'Invalid role'], 400);
         }
-        $user = User::whereHas($role)->findOrFail($id);
+        $user = User::whereHas("{$role}s")->findOrFail($id);
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
     }

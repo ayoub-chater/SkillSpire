@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inscription;
+use App\Models\Formation;
 use Illuminate\Support\Facades\Validator;
 
 class InscriptionController extends Controller
@@ -14,11 +15,11 @@ class InscriptionController extends Controller
         return response()->json($formations);
     }
 
-    
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'participant_id' => 'required|exists:participants,id',
+            'user_id' => 'required|exists:users,id',
             'formation_id' => 'required|exists:formations,id',
             'status' => 'required|string|max:255',
             'payment_proof' => 'required|string|max:255',
@@ -32,6 +33,15 @@ class InscriptionController extends Controller
         $centre = Inscription::create($validator->validated());
 
         return response()->json(['message' => 'Inscription created successfully' , 'inscription' => $centre]);
+    }
+
+    public function getUsersByFormation($formationId)
+    {
+        $formation = Formation::findOrFail($formationId);
+
+        $users = $formation->users()->withCount('inscriptions')->get();
+
+        return response()->json($users);
     }
 
 }

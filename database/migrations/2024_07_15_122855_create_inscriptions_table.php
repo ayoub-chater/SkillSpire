@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('payment_proof')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('justification')->nullable();
-            $table->unsignedBigInteger('participant_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('formation_id');
-            $table->foreign('participant_id')->references('id')->on('participants')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('formation_id')->references('id')->on('formations')->onDelete('cascade');
             $table->timestamps();
         });
